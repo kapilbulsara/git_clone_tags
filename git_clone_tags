@@ -1,0 +1,34 @@
+#! /bin/bash
+
+repo=$1
+dest=$2	
+env=$3
+
+tags=`git ls-remote --tags "$repo" | cut -f2 | cut -f3 -d /`
+
+
+if [ $env = 'repo' ]
+then
+		if [ ! -d "$dest" ]
+		then 
+				mkdir -p "$dest"
+		fi
+		cd "$dest"
+		for tag in $tags
+		do 
+				git clone "$repo" --branch="$tag"  "$tag" 
+				cd "$tag"
+				git checkout -b master
+				cd ..
+		done
+elif [ $env = 'branch' ]
+then
+		git clone "$repo" "$dest"
+		cd "$dest"
+		for tag in $tags
+		do 
+				git branch "$tag" "$tag"
+		done
+
+fi
+
